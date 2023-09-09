@@ -8,6 +8,8 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RegisterDto, ValidateDto } from './dto';
 import * as argon from 'argon2';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,8 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly manager: EntityManager,
+    private config: ConfigService,
+    private jwt: JwtService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -25,11 +29,7 @@ export class AuthService {
         password: pwHash,
       });
       await this.manager.save(user);
-      return {
-        username: user.username,
-        createdAt: user.created_at,
-        id: user.id,
-      };
+      return await this.signToken(user.id, user.username);
     } catch (error) {
       if (error.code === '23505') {
         // This is the code for a unique constraint violation in PostgreSQL
@@ -56,15 +56,31 @@ export class AuthService {
       if (!pwValid) {
         throw new ConflictException('Invalid password');
       }
-      return {
-        username: user.username,
-        createdAt: user.created_at,
-        id: user.id,
-      };
+      return this.signToken(user.id, user.username);
     } catch (error) {
       throw new InternalServerErrorException(
         error.message || 'An unknown error occurred',
       );
     }
+  }
+
+  async signToken(
+    id: string,
+    username: string,
+  ): Promise<{ access_token: string }> {
+    const payload = {
+      sub: id,
+      username,
+    };
+    const secret = this.config.get('JWT_SECRET');
+
+    const token = await this.jwt.signAsync(payload, {
+      expiresIn: '15m',
+      secret: secret,
+    });
+
+    return {
+      access_token: token,
+    };
   }
 }
