@@ -12,9 +12,10 @@ async function bootstrap() {
   );
   const config = new DocumentBuilder()
     .setTitle('Social Media Backend')
-    .setDescription('API description')
+    .setDescription('API description for Social Media Backend')
     .setVersion('1.0')
     .addTag('nestjs')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
