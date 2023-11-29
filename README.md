@@ -1,7 +1,7 @@
 
 # NestJS API with PostgreSQL and JWT Authentication
 
-This repository contains the code for an internship task completed for CodeInbound. The task involved creating a Node.js-based API using NestJS that interacts with a PostgreSQL database. The API supports CRUD (create, read, update, and delete) operations, implements user authentication and authorization using JSON Web Tokens (JWTs), and includes error handling and validation.
+The task involved creating a Node.js-based API using NestJS that interacts with a PostgreSQL database. The API supports CRUD (create, read, update, and delete) operations, implements user authentication and authorization using JSON Web Tokens (JWTs), and includes error handling and validation.
 
 ## Features
 
